@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @DisplayName("View 컨트롤러 - 게시글")
 @WebMvcTest(ArticleController.class)
@@ -29,6 +30,7 @@ class ArticleControllerTest {
         mockMvc.perform(get("/articles"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_HTML))
+                .andExpect(view().name("articles/index"))
                 .andExpect(MockMvcResultMatchers.model().attributeExists("articles"));
     }
 
@@ -41,7 +43,9 @@ class ArticleControllerTest {
         mockMvc.perform(get("/articles/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_HTML))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("article"));
+                .andExpect(view().name("articles/detail"))
+                .andExpect(MockMvcResultMatchers.model().attributeExists("article"))
+                .andExpect(MockMvcResultMatchers.model().attributeExists("articleComments"));
     }
     @DisplayName("[view][GET] 게시글 검색 전용 페이지 - 정상 호출")
     @Test
@@ -51,6 +55,7 @@ class ArticleControllerTest {
         // When & Then
         mockMvc.perform(get("/articles/search"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(view().name("articles/search"))
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_HTML));
     }
 
@@ -62,6 +67,7 @@ class ArticleControllerTest {
         // When & Then
         mockMvc.perform(get("/articles/search-hashtag"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(view().name("articles/search-hashtag"))
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_HTML));
     }
 }
