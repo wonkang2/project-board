@@ -44,5 +44,4 @@ public record UserAccountDto(
                 memo
         );
     }
-
 }
