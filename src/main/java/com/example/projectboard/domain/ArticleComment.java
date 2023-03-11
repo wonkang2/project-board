@@ -1,23 +1,16 @@
 package com.example.projectboard.domain;
 
 import lombok.*;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@ToString
+@ToString(callSuper = true)
 @Table(indexes = {
         @Index(columnList = "content"),
         @Index(columnList = "createdAt"),
-        @Index(columnList = "createdBy")
 })
 @Entity
 public class ArticleComment extends AuditingFields {
@@ -31,12 +24,16 @@ public class ArticleComment extends AuditingFields {
     @Setter @Column(nullable = false, length = 500)
     private String content; // 내용
 
-    private ArticleComment(Article article, String content) {
+    @ManyToOne(optional = false)
+    private UserAccount userAccount; // 유저 정보(id)
+
+    private ArticleComment(Article article, UserAccount userAccount, String content) {
+        this.userAccount = userAccount;
         this.article = article;
         this.content = content;
     }
-    public static ArticleComment of(Article article, String content) {
-        return new ArticleComment(article, content);
+    public static ArticleComment of(Article article, UserAccount userAccount, String content) {
+        return new ArticleComment(article, userAccount, content);
     }
 
     @Override
