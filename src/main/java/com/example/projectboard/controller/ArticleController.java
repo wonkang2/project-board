@@ -5,6 +5,7 @@ import com.example.projectboard.dto.ArticleDto;
 import com.example.projectboard.dto.response.ArticleResponse;
 import com.example.projectboard.dto.response.ArticleWithCommentsResponse;
 import com.example.projectboard.service.ArticleService;
+import com.example.projectboard.service.PaginationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/articles")
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ArticleController {
 
     private final ArticleService articleService;
+    private final PaginationService paginationService;
 
     @GetMapping
     public String articles(
@@ -33,9 +37,9 @@ public class ArticleController {
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             ModelMap map) {
         Page<ArticleResponse> response = articleService.searchArticles(searchType, searchValue, pageable).map(dto -> ArticleResponse.from(dto));
-        log.info("현재 수 : {}", response.getSize());
-        System.out.println(response);
+        List<Integer> barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), response.getTotalPages());
         map.addAttribute("articles", response);
+        map.addAttribute("paginationBarNumbers", barNumbers);
         return "articles/index";
     }
 
